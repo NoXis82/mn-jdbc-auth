@@ -12,7 +12,8 @@ import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Optional;
 
 
@@ -41,7 +42,15 @@ public class JDBCAuthenticationProvider implements AuthenticationProvider {
                 if (maybeUser.get().getPassword().equals(secret)) {
                     //pass
                     LOG.debug("User logged in...");
-                    emitter.onNext(AuthenticationResponse.success(identity, new ArrayList<>()));
+                    final HashMap<String, Object> attributes = new HashMap<>();
+                    attributes.put("hair_color", "brown");
+                    attributes.put("language", "en");
+                    var userDetails = AuthenticationResponse.success(
+                            identity,
+                            Collections.singletonList("ROLE_USER"),
+                            attributes
+                    );
+                    emitter.onNext(userDetails);
                     emitter.onComplete();
                     return;
                 } else {
